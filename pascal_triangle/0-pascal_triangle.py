@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Module containing the creation of pascal triangle"""
 
 def pascal_triangle(n):
     """return pascal triangle in form of list of int"""
