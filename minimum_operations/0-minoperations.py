@@ -10,7 +10,7 @@ def minOperations(n):
 
     while n > 1:
         while n % divisor == 0:
-            operation += divisor
+            operations += divisor
             n //= divisor
         divisor += 1
 
