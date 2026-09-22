@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """module of min operation needed"""
 
+
 def minOperations(n):
     if n <= 1:
         return 0
