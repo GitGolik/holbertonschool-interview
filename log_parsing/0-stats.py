@@ -1,19 +1,8 @@
 #!/usr/bin/python3
 """Log parsing: read stdin line by line and compute metrics."""
 
-import re
 import signal
 import sys
-
-# Format attendu :
-# <IP> - [<date>] "GET /projects/260 HTTP/1.1" <status> <size>
-LOG_PATTERN = re.compile(
-    r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # IP
-    r' - \[([^\]]+)\]'                        # date entre crochets
-    r' "GET /projects/260 HTTP/1\.1"'         # requête fixe
-    r' (\d{3})'                               # status code
-    r' (\d+)\s*$'                             # file size
-)
 
 VALID_STATUS = {200, 301, 400, 401, 403, 404, 405, 500}
 
@@ -42,18 +31,58 @@ signal.signal(signal.SIGINT, handle_interrupt)
 
 def parse_line(line: str):
     """
-    Parse une ligne selon le format attendu.
-    Retourne (status_code, file_size) ou (None, None) si invalide.
+    Parse une ligne selon le format :
+    <IP> - [<date>] "GET /projects/260 HTTP/1.1" <status> <size>
+    Retourne (status, size) ou (None, None) si invalide.
     """
-    match = LOG_PATTERN.match(line)
-    if not match:
+    # On enlève le \n de fin
+    line = line.rstrip('\n')
+
+    # Exemple de ligne :
+    # 192.168.1.1 - [01/Oct/2026:12:34:56 +0000] "GET /projects/260 HTTP/1.1" 200 1024
+
+    # On cherche la dernière occurrence de " " avant le status et size
+    # On split depuis la fin pour récupérer status et size
+    parts = line.split(' ')
+    if len(parts) < 2:
         return None, None
 
-    status = int(match.group(3))
-    size = int(match.group(4))
+    # Les deux derniers tokens doivent être status et size
+    status_str = parts[-2]
+    size_str = parts[-1]
+
+    # Vérif basique : status et size doivent être des entiers
+    if not status_str.isdigit() or not size_str.isdigit():
+        return None, None
+
+    status = int(status_str)
+    size = int(size_str)
 
     if status not in VALID_STATUS:
         return None, None
+
+    # Vérification grossière du format global :
+    # - il doit y avoir "GET /projects/260 HTTP/1.1" quelque part
+    # - il doit y avoir un IP au début et un [...] pour la date
+    # On ne fait pas de regex lourde, juste des vérifs de présence
+    if 'GET /projects/260 HTTP/1.1' not in line:
+        return None, None
+    if ' - [' not in line:
+        return None, None
+    if ']' not in line:
+        return None, None
+
+    # On peut aussi vérifier rapidement que l'IP ressemble à x.x.x.x
+    ip_part = parts[0]
+    ip_blocks = ip_part.split('.')
+    if len(ip_blocks) != 4:
+        return None, None
+    for block in ip_blocks:
+        if not block.isdigit():
+            return None, None
+        val = int(block)
+        if val < 0 or val > 255:
+            return None, None
 
     return status, size
 
@@ -62,7 +91,6 @@ def main():
     global total_size, lines_processed
 
     for line in sys.stdin:
-        line = line.rstrip('\n')
         status, size = parse_line(line)
         if status is None:
             continue
