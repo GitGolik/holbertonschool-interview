@@ -8,11 +8,11 @@ import sys
 # Format attendu :
 # <IP> - [<date>] "GET /projects/260 HTTP/1.1" <status> <size>
 LOG_PATTERN = re.compile(
-    r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'      # IP
-    r' - \[([^\]]+)\]'                            # date entre crochets
-    r' "GET /projects/260 HTTP/1\.1"'             # requête fixe
-    r' (\d{3})'                                   # status code
-    r' (\d+)$'                                    # file size
+    r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
+    r'\s*-\s*\[([^\]]+)\]'
+    r'\s*"GET /projects/260 HTTP/1\.1"'
+    r'\s+(\d{3})'
+    r'\s+(\d+)\s*$'
 )
 
 VALID_STATUS = {200, 301, 400, 401, 403, 404, 405, 500}
