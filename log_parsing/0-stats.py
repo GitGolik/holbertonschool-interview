@@ -73,12 +73,15 @@ def parse_line(line: str):
         return None, None
 
     # On peut aussi vérifier rapidement que l'IP ressemble à x.x.x.x
-        ip_part = parts[0]
+    ip_part = parts[0]
     ip_blocks = ip_part.split('.')
     if len(ip_blocks) != 4:
         return None, None
     for block in ip_blocks:
         if not block.isdigit():
+            return None, None
+        val = int(block)
+        if val < 0 or val > 255:
             return None, None
 
     return status, size
