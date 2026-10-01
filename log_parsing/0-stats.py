@@ -8,11 +8,11 @@ import sys
 # Format attendu :
 # <IP> - [<date>] "GET /projects/260 HTTP/1.1" <status> <size>
 LOG_PATTERN = re.compile(
-    r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
-    r'\s*-\s*\[([^\]]+)\]'
-    r'\s*"GET /projects/260 HTTP/1\.1"'
-    r'\s+(\d{3})'
-    r'\s+(\d+)\s*$'
+    r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # IP
+    r' - \[([^\]]+)\]'                        # date entre crochets
+    r' "GET /projects/260 HTTP/1\.1"'         # requête fixe
+    r' (\d{3})'                               # status code
+    r' (\d+)\s*$'                             # file size
 )
 
 VALID_STATUS = {200, 301, 400, 401, 403, 404, 405, 500}
@@ -40,12 +40,12 @@ def handle_interrupt(sig, frame):
 signal.signal(signal.SIGINT, handle_interrupt)
 
 
-def parse_line(line: str) -> tuple:
+def parse_line(line: str):
     """
     Parse une ligne selon le format attendu.
     Retourne (status_code, file_size) ou (None, None) si invalide.
     """
-    match = LOG_PATTERN.match(line.strip())
+    match = LOG_PATTERN.match(line)
     if not match:
         return None, None
 
@@ -62,6 +62,7 @@ def main():
     global total_size, lines_processed
 
     for line in sys.stdin:
+        line = line.rstrip('\n')
         status, size = parse_line(line)
         if status is None:
             continue
