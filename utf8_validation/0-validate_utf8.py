@@ -8,16 +8,16 @@ def validUTF8(data):
     remaining = 0
 
     for d in data:
-        byte = d&0xff # si plus de 8 bits, on recup les 8 derniers
+        byte = d & 0xFF  # si plus de 8 bits, on recup les 8 derniers
 
         if remaining == 0:
-            if byte >> 7 == 0b0: # 1xxxxxxx => recup le 1
+            if byte >> 7 == 0b0:  # 0xxxxxxx => 1 octet
                 continue
-            elif byte >> 5 == 0b110: 
+            elif byte >> 5 == 0b110:  # 110xxxxx => 2 octets
                 remaining = 1
-            elif byte >> 4 == 0b1110: 
+            elif byte >> 4 == 0b1110:  # 1110xxxx => 3 octets
                 remaining = 2
-            elif byte >> 3 == 0b11110: 
+            elif byte >> 3 == 0b11110:  # 11110xxx => 4 octets
                 remaining = 3
             else:
                 return False
