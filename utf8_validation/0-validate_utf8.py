@@ -4,7 +4,8 @@
 
 def validUTF8(data):
     """validation"""
-
+    remaining = 0
+    
     for d in data:
         byte = d&0xff # si plus de 8 bits, on recup les 8 derniers
 
