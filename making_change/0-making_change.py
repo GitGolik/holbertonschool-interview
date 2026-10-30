@@ -1,6 +1,9 @@
 #!/usr/bin/python3
+"""modul to make change"""
+
 
 def makeChange(coins, total):
+    """look at how much change is needed and count the number of coins needed"""
     if total <= 0:
         return 0
 
