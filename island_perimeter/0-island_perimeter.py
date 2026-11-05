@@ -1,7 +1,9 @@
 #!/usr/bin/python3
+"""search the perimeter of an island"""
+
 
 def island_perimeter(grid):
-
+"""search the perimeter of the island and verify it"""
     perimeter = 0
     rows = len(grid)
     if rows > 0:
