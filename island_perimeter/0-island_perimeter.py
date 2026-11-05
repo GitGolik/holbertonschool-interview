@@ -4,6 +4,7 @@
 
 def island_perimeter(grid):
     """search the perimeter of the island and verify it"""
+
     perimeter = 0
     rows = len(grid)
     if rows > 0:
@@ -11,7 +12,7 @@ def island_perimeter(grid):
     else :
         cols = 0
 
-    for i in rang(rows):
+    for i in range(rows):
         for j in range(cols):
             if grid[i][j] == 1:
                 perimeter += 4
