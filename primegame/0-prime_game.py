@@ -1,56 +1,68 @@
 #!/usr/bin/python3
-"""Prime Game: determine the winner of each round."""
+"""Prime Game."""
 
 
 def isWinner(x, nums):
-    """Return the player who wins the most rounds.
+    """Determine the winner of the prime game.
 
     Args:
-        x (int): number of rounds
-        nums (list): list of maximum integers for each round
+        x (int): Number of rounds.
+        nums (list): Maximum number for each round.
 
     Returns:
-        str: "Maria" or "Ben"
-        None: if the winner cannot be determined
+        str: Name of the player with the most wins.
+        None: If the winner cannot be determined.
     """
     if x < 1 or not nums:
         return None
 
-    max_n = max(nums)
-    if max_n < 2:
-        return None
+    max_num = max(nums)
+
+    if max_num < 2:
+        return "Ben"
 
     # Sieve of Eratosthenes
-    is_prime = [True] * (max_n + 1)
-    is_prime[0] = is_prime[1] = False
+    is_prime = [True] * (max_num + 1)
+    is_prime[0] = False
 
-    for i in range(2, int(max_n ** 0.5) + 1):
+    if max_num >= 1:
+        is_prime[1] = False
+
+    i = 2
+    while i * i <= max_num:
         if is_prime[i]:
-            for multiple in range(i * i, max_n + 1, i):
-                is_prime[multiple] = False
+            j = i * i
+            while j <= max_num:
+                is_prime[j] = False
+                j += i
+        i += 1
 
-    # Count of primes <= i
-    prime_count = [0] * (max_n + 1)
+    # prime_count[n] = number of primes less than or equal to n
+    prime_count = [0] * (max_num + 1)
     count = 0
-    for i in range(max_n + 1):
-        if is_prime[i]:
+
+    for n in range(max_num + 1):
+        if is_prime[n]:
             count += 1
-        prime_count[i] = count
+        prime_count[n] = count
 
-    maria = 0
-    ben = 0
+    maria_wins = 0
+    ben_wins = 0
 
-    for i in range(x):
-        n = nums[i]
+    for round_number in range(x):
+        n = nums[round_number]
+
         if n < 2:
-            ben += 1
+            ben_wins += 1
         elif prime_count[n] % 2 == 1:
-            maria += 1
+            maria_wins += 1
         else:
-            ben += 1
+            ben_wins += 1
 
-    if maria > ben:
+    if maria_wins > ben_wins:
         return "Maria"
-    if ben > maria:
+
+    if ben_wins > maria_wins:
         return "Ben"
+
     return None
